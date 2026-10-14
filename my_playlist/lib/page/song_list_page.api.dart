@@ -320,8 +320,7 @@ class _SongListPageState extends State<SongListAPIPage> {
                                   songItem.song,
                                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: isSelected ? 16 : 15),
                                 ),
-                                subtitle: Text(
-                                  '(${songItem.artist})\n${songItem.type} Song • ${songItem.date} • ${songItem.content}',
+                                subtitle: Text('(${songItem.artist})\n${songItem.type} Song • ${songItem.date} • ${songItem.content}',
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(color: Colors.white60, fontSize: 12, height: 1.35),
@@ -330,10 +329,7 @@ class _SongListPageState extends State<SongListAPIPage> {
                                   IconButton(
                                     icon: const Icon(Icons.change_circle, color: Colors.blue),
                                     onPressed: () async {
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => AddSongPage(existing: songItem)),
-                                      );
+                                      final result = await Navigator.push(context, MaterialPageRoute(builder: (context) => AddSongPage(existing: songItem)),);
                                       if (!mounted) return;
                                       if (result != null && result is Song) await _updateDiary(result);
                                     },

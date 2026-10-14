@@ -327,8 +327,7 @@ class _SongListPageState extends State<SongListDBPage> {
                   ),
                   child: Column(
                     children: [
-                      Text(
-                        '"${quote.text}"',
+                      Text('"${quote.text}"',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontStyle: FontStyle.italic,
@@ -376,10 +375,7 @@ class _SongListPageState extends State<SongListDBPage> {
                     color: Colors.white.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: Text(
-                    '${climate.current.temperature2m} '
-                    '${climate.currentUnits.temperature2m} '
-                    '${climate.current.time}',
+                  child: Text('${climate.current.temperature2m} ''${climate.currentUnits.temperature2m} ''${climate.current.time}',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white70,
