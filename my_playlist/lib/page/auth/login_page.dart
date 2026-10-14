@@ -1,9 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_playlist/page/main_page.dart';
 
-// ตรวจสอบสถานะล็อกอินและนำทางไปยังหน้าที่เหมาะสม
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -14,17 +12,14 @@ class AuthGate extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
+            backgroundColor: Color(0xFF080808),
             body: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(color: Color(0xFF818CF8)),
             ),
           );
         }
 
-        if (snapshot.hasData) {
-          return const MainPage();
-        }
-
-        return const LoginPage();
+        return snapshot.hasData ? const MainPage() : const LoginPage();
       },
     );
   }
@@ -46,6 +41,10 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLogin = true;
   bool _loading = false;
   String _error = '';
+
+  final _background = const Color(0xFF080808);
+  final _surface = const Color(0xFF1B1B1B);
+  final _primary = const Color(0xFF818CF8);
 
   @override
   void dispose() {
@@ -113,17 +112,34 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       setState(() => _error = 'เกิดข้อผิดพลาด: $e');
     } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
+      if (mounted) setState(() => _loading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final inputDecoration = InputDecoration(
+      filled: true,
+      fillColor: _surface,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: _primary),
+      ),
+      labelStyle: const TextStyle(color: Colors.white60),
+      prefixIconColor: Colors.white54,
+    );
+
     return Scaffold(
+      backgroundColor: _background,
       appBar: AppBar(
+        backgroundColor: _background,
+        foregroundColor: Colors.white,
         title: Text(_isLogin ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'),
+        centerTitle: true,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -133,36 +149,41 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.queue_music,
-                  size: 80,
-                  color: Colors.indigo,
+                Icon(Icons.queue_music, size: 72, color: _primary),
+                const SizedBox(height: 12),
+                const Text(
+                  'MyPlaylist',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
+                  style: const TextStyle(color: Colors.white),
+                  decoration: inputDecoration.copyWith(
                     labelText: 'อีเมล',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
+                    prefixIcon: const Icon(Icons.email_outlined),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(
+                  style: const TextStyle(color: Colors.white),
+                  decoration: inputDecoration.copyWith(
                     labelText: 'รหัสผ่าน',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
+                    prefixIcon: const Icon(Icons.lock_outline),
                   ),
                 ),
                 if (_error.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Text(
                     _error,
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.redAccent),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -171,24 +192,38 @@ class _LoginPageState extends State<LoginPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _loading ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primary,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                     child: _loading
-                        ? const CircularProgressIndicator()
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.black,
+                            ),
+                          )
                         : Text(_isLogin ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'),
                   ),
                 ),
                 TextButton(
                   onPressed: _loading
                       ? null
-                      : () {
-                          setState(() {
+                      : () => setState(() {
                             _isLogin = !_isLogin;
                             _error = '';
-                          });
-                        },
+                          }),
                   child: Text(
                     _isLogin
                         ? 'ยังไม่มีบัญชี? สมัครสมาชิก'
                         : 'มีบัญชีแล้ว? เข้าสู่ระบบ',
+                    style: TextStyle(color: _primary),
                   ),
                 ),
               ],
