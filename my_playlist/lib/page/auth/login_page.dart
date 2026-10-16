@@ -6,23 +6,18 @@ class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: Color(0xFF080808),
-            body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF818CF8)),
-            ),
-          );
-        }
-
-        return snapshot.hasData ? const MainPage() : const LoginPage();
-      },
-    );
-  }
+  Widget build(BuildContext context) => StreamBuilder<User?>(
+    stream: FirebaseAuth.instance.authStateChanges(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Scaffold(
+          backgroundColor: Color(0xFF080808),
+          body: Center(child: CircularProgressIndicator(color: Color(0xFF818CF8))),
+        );
+      }
+      return snapshot.hasData ? const MainPage() : const LoginPage();
+    },
+  );
 }
 
 class LoginPage extends StatefulWidget {
@@ -37,14 +32,13 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
   bool _isLogin = true;
   bool _loading = false;
   String _error = '';
 
-  final _background = const Color(0xFF080808);
-  final _surface = const Color(0xFF1B1B1B);
-  final _primary = const Color(0xFF818CF8);
+  static const _background = Color(0xFF080808);
+  static const _surface = Color(0xFF1B1B1B);
+  static const _primary = Color(0xFF818CF8);
 
   @override
   void dispose() {
@@ -69,19 +63,12 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       if (_isLogin) {
-        await LoginPage.auth.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        await LoginPage.auth.signInWithEmailAndPassword(email: email, password: password);
       } else {
-        await LoginPage.auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        await LoginPage.auth.createUserWithEmailAndPassword(email: email, password: password);
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-
       setState(() {
         switch (e.code) {
           case 'weak-password':
@@ -121,14 +108,8 @@ class _LoginPageState extends State<LoginPage> {
     final inputDecoration = InputDecoration(
       filled: true,
       fillColor: _surface,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: _primary),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: _primary)),
       labelStyle: const TextStyle(color: Colors.white60),
       prefixIconColor: Colors.white54,
     );
@@ -146,88 +127,52 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 420),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.queue_music, size: 72, color: _primary),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.queue_music, size: 72, color: _primary),
+              const SizedBox(height: 12),
+              const Text('MyPlaylist', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 28),
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                style: const TextStyle(color: Colors.white),
+                decoration: inputDecoration.copyWith(labelText: 'อีเมล', prefixIcon: const Icon(Icons.email_outlined)),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: inputDecoration.copyWith(labelText: 'รหัสผ่าน', prefixIcon: const Icon(Icons.lock_outline)),
+              ),
+              if (_error.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'MyPlaylist',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 28),
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: inputDecoration.copyWith(
-                    labelText: 'อีเมล',
-                    prefixIcon: const Icon(Icons.email_outlined),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: inputDecoration.copyWith(
-                    labelText: 'รหัสผ่าน',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                  ),
-                ),
-                if (_error.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    _error,
-                    style: const TextStyle(color: Colors.redAccent),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _loading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _primary,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: _loading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.black,
-                            ),
-                          )
-                        : Text(_isLogin ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'),
-                  ),
-                ),
-                TextButton(
-                  onPressed: _loading
-                      ? null
-                      : () => setState(() {
-                            _isLogin = !_isLogin;
-                            _error = '';
-                          }),
-                  child: Text(
-                    _isLogin
-                        ? 'ยังไม่มีบัญชี? สมัครสมาชิก'
-                        : 'มีบัญชีแล้ว? เข้าสู่ระบบ',
-                    style: TextStyle(color: _primary),
-                  ),
-                ),
+                Text(_error, style: const TextStyle(color: Colors.redAccent), textAlign: TextAlign.center),
               ],
-            ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _loading ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _primary,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: _loading
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                      : Text(_isLogin ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก'),
+                ),
+              ),
+              TextButton(
+                onPressed: _loading ? null : () => setState(() {
+                  _isLogin = !_isLogin;
+                  _error = '';
+                }),
+                child: Text(_isLogin ? 'ยังไม่มีบัญชี? สมัครสมาชิก' : 'มีบัญชีแล้ว? เข้าสู่ระบบ', style: const TextStyle(color: _primary)),
+              ),
+            ]),
           ),
         ),
       ),
