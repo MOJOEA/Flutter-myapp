@@ -52,6 +52,15 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  
+  # เพิ่มแพ็กเกจสำหรับเจนไอคอนแอปตาม Lab
+  flutter_launcher_icons: ^0.13.1
+
+# ตั้งค่าตำแหน่งของรูปไอคอนแอป
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -63,6 +72,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # เปิดใช้งานโฟลเดอร์ assets เพื่อให้แอปมองเห็นไฟล์ icon.png
+  assets:
+    - assets/icon.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
