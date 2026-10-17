@@ -2,27 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:my_playlist/models/song.dart';
 
+import 'package:my_playlist/Util/gettype_color.dart';
+
 class SongDetailPage extends StatelessWidget {
   final Song diary;
   const SongDetailPage({super.key, required this.diary});
 
-  Color _getTypeColor(String type) {
-    switch (type) {
-      case 'Pop': return Colors.blue;
-      case 'Rock': return Colors.orange;
-      case 'Metal': return Colors.red;
-      case 'Indie': return Colors.cyan;
-      case 'R&B Soul': return Colors.purple;
-      case 'EDM': return Colors.grey;
-      case 'Jazz': return Colors.amber;
-      case 'Acoustic / Folk': return Colors.green;
-      default: return Colors.blue;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final typeColor = _getTypeColor(diary.type);
+    final typeColor = getTypeColor(diary.type);
 
     return Scaffold(
       backgroundColor: const Color(0xFF080808),

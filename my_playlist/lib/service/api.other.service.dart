@@ -1,75 +1,42 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
-import 'package:my_playlist/models/quote.dart';
-import 'package:my_playlist/models/climate.dart';
 import 'package:my_playlist/models/random_song.dart';
 
 class ApiService {
-  static Future<Quote> fetchQuote() async {
-    final response = await http.get(
-      Uri.parse('https://dummyjson.com/quotes/random'),
-    );
 
-    if (response.statusCode == 200) {
-      return Quote.fromJson(jsonDecode(response.body));
-    }
-
-    throw Exception('โหลดคำคมไม่สำเร็จ (${response.statusCode})');
-  }
-
-  static Future<Climate> fetchClimate() async {
-    final response = await http.get(
-      Uri.parse(
-        'https://api.open-meteo.com/v1/forecast?latitude=13.75&longitude=100.5&current=temperature_2m',
-      ),
-    );
-
-    if (response.statusCode == 200) {
-      return Climate.fromJson(jsonDecode(response.body));
-    }
-
-    throw Exception('โหลดสภาพอากาศไม่สำเร็จ (${response.statusCode})');
-  }
-
-  static Future<RandomSong> fetchRandomSong({String keyword = 'pop'}) async {
+  static Future<RandomSong> fetchRandomSong() async {
+    final genres = {
+      'Pop': 'pop',
+      'Rock': 'rock',
+      'Metal': 'heavy metal',
+      'Indie': 'indie',
+      'R&B Soul': 'r&b soul',
+      'EDM': 'electronic dance',
+      'Jazz': 'jazz',
+      'Acoustic / Folk': 'acoustic folk',
+    };
+    final type = genres.keys.toList()[Random().nextInt(genres.length)];
     final url = Uri.https('itunes.apple.com', '/search', {
-      'term': keyword,
+      'term': genres[type]!,
       'media': 'music',
       'entity': 'song',
-      'limit': '50',
+      'limit': '100',
       'country': 'th',
     });
-
     final response = await http.get(url);
-
     if (response.statusCode != 200) {
       throw Exception('โหลดเพลงไม่สำเร็จ (${response.statusCode})');
     }
-
     final data = jsonDecode(response.body);
     final songs = (data['results'] as List)
         .where((song) => song['trackId'] != null)
-        .map((song) => RandomSong.fromJson(song as Map<String, dynamic>))
+        .map((song) => RandomSong.fromJson({
+              ...song as Map<String, dynamic>,
+              'type': type,
+            }))
         .toList();
-
     if (songs.isEmpty) throw Exception('ไม่พบเพลง');
-
-    final song = songs[Random().nextInt(songs.length)];
-
-    try {
-      final lyricsUrl = Uri.https(
-        'api.lyrics.ovh',
-        '/v1/${Uri.encodeComponent(song.artist)}/${Uri.encodeComponent(song.name)}',
-      );
-      final lyricsResponse = await http.get(lyricsUrl);
-
-      if (lyricsResponse.statusCode == 200) {
-        final lyrics = jsonDecode(lyricsResponse.body)['lyrics'] as String?;
-        return song.copyWith(lyrics: lyrics);
-      }
-    } catch (_) {}
-
-    return song;
+    return songs[Random().nextInt(songs.length)];
   }
 }

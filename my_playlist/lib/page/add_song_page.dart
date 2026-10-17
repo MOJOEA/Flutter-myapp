@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:my_playlist/models/song.dart';
-import 'package:my_playlist/models/quote.dart';
-import 'package:my_playlist/models/climate.dart';
+
 
 class AddSongPage extends StatefulWidget {
   final Song? existing;
-  final Quote? quote;
-  final Climate? climate;
 
-  const AddSongPage({super.key, this.existing, this.quote, this.climate});
+  const AddSongPage({super.key, this.existing});
 
   @override
   State<AddSongPage> createState() => _AddSongPageState();
@@ -35,9 +32,6 @@ class _AddSongPageState extends State<AddSongPage> {
       _contentController.text = widget.existing!.content;
       _selectedType = widget.existing!.type;
       _selectedDate = DateTime.parse(widget.existing!.date);
-    }
-    if (widget.quote != null || widget.climate != null) {
-      _contentController.text = '${widget.quote?.text ?? ''} ${widget.climate?.current.temperature2m ?? ''} ${widget.climate?.currentUnits.temperature2m ?? ''}';
     }
   }
 
@@ -117,6 +111,7 @@ class _AddSongPageState extends State<AddSongPage> {
                     },
                   ),
                 ),
+
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('ทำเครื่องหมายว่าสำคัญ', style: TextStyle(color: Colors.white)),
@@ -124,6 +119,7 @@ class _AddSongPageState extends State<AddSongPage> {
                   activeColor: primary,
                   onChanged: (value) => setState(() => _isImportant = value!),
                 ),
+
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('ปักหมุดบันทึก', style: TextStyle(color: Colors.white)),
@@ -131,6 +127,7 @@ class _AddSongPageState extends State<AddSongPage> {
                   activeColor: const Color(0xFFEC4899),
                   onChanged: (value) => setState(() => _isPinned = value),
                 ),
+
                 RadioListTile<String>(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('ส่วนตัว', style: TextStyle(color: Colors.white)),
@@ -139,6 +136,7 @@ class _AddSongPageState extends State<AddSongPage> {
                   activeColor: primary,
                   onChanged: (value) => setState(() => _type = value!),
                 ),
+
                 RadioListTile<String>(
                   contentPadding: EdgeInsets.zero,
                   title: const Text('งาน', style: TextStyle(color: Colors.white)),
@@ -147,6 +145,7 @@ class _AddSongPageState extends State<AddSongPage> {
                   activeColor: const Color(0xFFEC4899),
                   onChanged: (value) => setState(() => _type = value!),
                 ),
+                
                 const SizedBox(height: 18),
                 SizedBox(
                   width: double.infinity,
